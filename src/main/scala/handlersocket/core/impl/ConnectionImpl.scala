@@ -5,13 +5,37 @@ import java.util.concurrent.atomic.AtomicInteger
 
 /**
  * Represents a connection to the database.
+ *
+ * TODO: HandlerSocket uses different ports for reading and writing, so the connection design should possibly change to
+ * incorporate that concept.
  */
-class ConnectionImpl(host: String, port: Int, databaseName: String) extends Connection {
+class ConnectionImpl(host: String, readPort: Int, writePort: Int, databaseName: String) extends Connection {
   /**
    * {@inheritDoc}
    */
   def openIndex(tableName: String, indexName: String, columnNames: String*): Index = {
-    new IndexImpl(this, IndexIdFactory.id, tableName, indexName, columnNames)
+    val id = IndexIdFactory.id
+    val cmd = "P\t%s\t%s\t%s\t%s\t%s".format(id, databaseName, tableName, indexName, columnNames.mkString(","))
+    send(cmd)
+    new IndexImpl(this, id, tableName, indexName, columnNames)
+  }
+
+  private[impl] def send(command: String): Unit = {
+    // TODO: switch to real logging
+    printf("Sending command: %s%n", command)
+  }
+
+  private def parse(response: String): Unit = {
+    printf("Parsing response: %s%n", response)
+    val tokens = response.split('\t')
+    if (tokens[0] != "0") {
+      if (tokens.length > 2) {
+        throw new HandlerSocketException(tokens[2])
+      }
+      else {
+        throw new HandlerSocketException("Unexplained error")
+      }
+    }
   }
 }
 
@@ -32,12 +56,19 @@ object IndexIdFactory {
 /**
  * Represents an index in the database that this Index's Connection points to.
  */
-class IndexImpl(connection: Connection, id: Int, tableName: String, indexName: String, columnNames: Seq[String]) extends Index {
+class IndexImpl(connection: ConnectionImpl, id: Int, tableName: String, indexName: String, columnNames: Seq[String])
+  extends Index {
   /**
    * {@inheritDoc}
    */
   def find(comparator: String, values: String*): RowSet = {
-    throw new UnsupportedOperationException("Not yet implemented")
+    val cmd = new StringBuilder("%s\t%s\t%s".format(id, comparator, values.length))
+    for (value <- values) {
+      cmd.append("\t").append(value)
+    }
+    cmd.append("\t1\t0"); // TODO: figure out a more appropriate design for handling limit and offset
+    connection.send(cmd.toString)
+    new RowSetImpl
   }
 }
 
