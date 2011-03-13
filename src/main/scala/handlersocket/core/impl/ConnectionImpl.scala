@@ -28,9 +28,9 @@ class ConnectionImpl(host: String, readPort: Int, writePort: Int, databaseName: 
   private def parse(response: String): Unit = {
     printf("Parsing response: %s%n", response)
     val tokens = response.split('\t')
-    if (tokens[0] != "0") {
+    if (tokens(0) != "0") {
       if (tokens.length > 2) {
-        throw new HandlerSocketException(tokens[2])
+        throw new HandlerSocketException(tokens(2))
       }
       else {
         throw new HandlerSocketException("Unexplained error")
