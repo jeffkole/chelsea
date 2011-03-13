@@ -1,6 +1,8 @@
 package com.kolesky.handlersocket.core.impl
 
 import com.kolesky.handlersocket.core._
+import com.kolesky.handlersocket.core.support.Logging
+
 import java.util.concurrent.atomic.AtomicInteger
 
 /**
@@ -9,7 +11,7 @@ import java.util.concurrent.atomic.AtomicInteger
  * TODO: HandlerSocket uses different ports for reading and writing, so the connection design should possibly change to
  * incorporate that concept.
  */
-class ConnectionImpl(host: String, readPort: Int, writePort: Int, databaseName: String) extends Connection {
+class ConnectionImpl(host: String, readPort: Int, writePort: Int, databaseName: String) extends Connection with Logging {
   /**
    * {@inheritDoc}
    */
@@ -21,12 +23,11 @@ class ConnectionImpl(host: String, readPort: Int, writePort: Int, databaseName: 
   }
 
   private[impl] def send(command: String): Unit = {
-    // TODO: switch to real logging
-    printf("Sending command: %s%n", command)
+    trace("Sending command: %s%n", command)
   }
 
   private def parse(response: String): Unit = {
-    printf("Parsing response: %s%n", response)
+    trace("Parsing response: %s%n", response)
     val tokens = response.split('\t')
     if (tokens(0) != "0") {
       if (tokens.length > 2) {
