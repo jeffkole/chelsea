@@ -1,13 +1,9 @@
 package com.kolesky.handlersocket.core.support
 
-//import net.lag.logging.Logger
+import net.lag.logging.Logger
 
 trait Logging {
-  def trace(msg: String, items: Any*) = printf(msg, items: _*)
-
-/* TODO: put this back in once you figure out how to get resources loaded during test runs
   Bootstrap
-
   private val logger = Logger.get
 
   def fatal(msg: String, items: Any*) = logger.fatal(msg, items: _*)
@@ -24,5 +20,4 @@ trait Logging {
   def debug(thrown: Throwable, msg: String, items: Any*) = logger.debug(thrown, msg, items: _*)
   def trace(msg: String, items: Any*) = logger.trace(msg, items: _*)
   def trace(thrown: Throwable, msg: String, items: Any*) = logger.trace(thrown, msg, items: _*)
-*/
 }

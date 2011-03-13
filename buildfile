@@ -10,11 +10,13 @@ require 'buildr/scala'
 
 # Specify Maven 2.0 remote repositories here, like this:
 repositories.remote << "http://www.ibiblio.org/maven2/"
+repositories.remote << "http://scala-tools.org/repo-releases/"
 
 desc "A HandlerSocket client written in Scala"
 define "chelsea" do
-
   project.version = VERSION_NUMBER
   project.group = GROUP
   manifest["Implementation-Vendor"] = COPYRIGHT
+
+  compile.with "net.lag:configgy:jar:2.0.0"
 end
