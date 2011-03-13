@@ -4,6 +4,8 @@ import org.scalatest.BeforeAndAfterEach
 import org.scalatest.FlatSpec
 import org.scalatest.matchers.ShouldMatchers
 
+import com.kolesky.handlersocket.core.net.StringSocket
+
 import java.net.Socket
 
 class MockServerSpec extends FlatSpec with BeforeAndAfterEach with ShouldMatchers {
@@ -21,13 +23,17 @@ class MockServerSpec extends FlatSpec with BeforeAndAfterEach with ShouldMatcher
   }
 
   private def send(message: String): Unit = {
-    val socket = new Socket("localhost", port)
-    val bytes = message.getBytes("UTF-8")
-    socket.getOutputStream.write(bytes, 0, bytes.length)
+    val socket = new StringSocket(new Socket("localhost", port), 0x0)
+    socket.send(message)
     socket.close
+    // the sleep is required to make sure server has received and processed
+    // the message before asking it for the last command
+    Thread.sleep(100)
   }
 
-  "A server" should "report empty command until it has received one" in {
+  behavior of "A server"
+
+  it should "report empty command until it has received one" in {
     server.lastCommand should have length (0)
   }
 
