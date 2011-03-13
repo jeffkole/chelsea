@@ -19,7 +19,7 @@ class ConnectionImpl(host: String, readPort: Int, writePort: Int, databaseName: 
     val id = IndexIdFactory.id
     val cmd = "P\t%s\t%s\t%s\t%s\t%s".format(id, databaseName, tableName, indexName, columnNames.mkString(","))
     send(cmd)
-    new IndexImpl(this, id, tableName, indexName, columnNames)
+    new IndexImpl(this, id, tableName, indexName, columnNames: _*)
   }
 
   private[impl] def send(command: String): Unit = {
@@ -57,7 +57,7 @@ object IndexIdFactory {
 /**
  * Represents an index in the database that this Index's Connection points to.
  */
-class IndexImpl(connection: ConnectionImpl, id: Int, tableName: String, indexName: String, columnNames: Seq[String])
+class IndexImpl(connection: ConnectionImpl, id: Int, tableName: String, indexName: String, columnNames: String*)
   extends Index {
   /**
    * {@inheritDoc}
